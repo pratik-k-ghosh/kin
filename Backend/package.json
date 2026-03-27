@@ -1,0 +1,33 @@
+{
+  "name": "kin",
+  "version": "1.0.0",
+  "description": "Privacy-first social media app with connection-based sharing, custom audience control, and a quiet feed built for real connections.",
+  "keywords": [
+    "kin",
+    "privacy",
+    "social",
+    "networking",
+    "connection-based-sharing",
+    "custom-audience-control"
+  ],
+  "homepage": "https://github.com/pratik-k-ghosh/kin#readme",
+  "bugs": {
+    "url": "https://github.com/pratik-k-ghosh/kin/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pratik-k-ghosh/kin.git"
+  },
+  "license": "MIT",
+  "author": "Pratik Kumar Ghosh",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon ./server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1"
+  }
+}
