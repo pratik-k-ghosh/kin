@@ -1,0 +1,22 @@
+.home-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 5vh;
+  overflow-x: hidden;
+}
+
+.post {
+  border: 2px solid #000;
+  padding: 5vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2vh;
+  width: 60vw;
+}
+
+.post > img {
+  max-width: 60vw;
+}
