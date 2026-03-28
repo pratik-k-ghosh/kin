@@ -217,58 +217,21 @@ Future / Possible Additions
 
 ---
 
-## PROJECT STRUCTURE
-
-**Initial structure:**
-
-Kin/
-├── backend/
-│ ├── src/
-│ │ ├── config/
-│ │ ├── models/
-│ │ ├── modules/
-│ │ ├── services/
-│ │ └── app.js
-│ ├── .gitignore
-│ ├── package.json
-│ └── server.js
-│
-├── frontend/
-│ ├── public/
-│ ├── src/
-│ │ ├── assets/
-│ │ ├── pages/
-│ │ ├── styles/
-│ │ ├── App.jsx
-│ │ ├── index.css
-│ │ └── main.jsx
-│ ├── .gitignore
-│ ├── README.md
-│ ├── eslint.config.js
-│ ├── index.html
-│ ├── package-lock.json
-│ ├── package.json
-│ └── vite.config.js
-│
-├── LICENSE
-└── README.md
-
----
-
 ## API OVERVIEW
 
 Current Minimal APIs
 
 Create Post
-POST /api/posts
+POST /api/post/create
 
 Form Data
 
-- image — uploaded image file
 - caption — text caption
+- image — uploaded image file
+- content — text content
 
 Get Posts
-GET /api/posts
+GET /api/post
 
 Returns posts sorted by newest first.
 
@@ -279,17 +242,16 @@ Returns posts sorted by newest first.
 Post
 {
 \_id,
-author,
-imageUrl,
 caption,
-likesCount,
-commentsCount,
+img,
+content,
 createdAt,
 updatedAt
 }
 
 This model will expand later to support:
 
+- Author details
 - visibility settings
 - selected audience
 - circles
@@ -323,7 +285,7 @@ Prerequisites
 Installation
 
 1. Clone the repository
-   git clone https://github.com/your-username/kin.git
+   git clone https://github.com/pratik-k-ghosh/kin.git
    cd kin
 
 2. Install backend dependencies
@@ -338,9 +300,9 @@ Environment Variables
 Create a .env file inside the backend folder.
 
 Example:
-PORT=5000
-MONGODB_URI=your_mongodb_connection_string
-CLIENT_URL=http://localhost:5173
+PORT=3000
+MONGO_URI=mongodb://localhost:27017/kin
+IMAGEKIT_PRIVATE_KEY=private_imagekit_key_here
 
 You can expand this later with:
 
@@ -379,7 +341,7 @@ npm run dev
 
 ---
 
-## WHY THIS PROJECT MATTERS
+## WHY THIS PROJECT IS DIFFERENT
 
 Kin is not meant to be just another social media clone.
 
@@ -406,7 +368,7 @@ It is also a way to deeply revise and practice:
 
 ## SCREENSHOTS
 
-Add screenshots here as the UI evolves.
+WILL Add screenshots here as the UI evolves.
 
 Planned placeholders:
 
@@ -416,17 +378,13 @@ Planned placeholders:
 - Connection Request Flow
 - Audience Selection UI
 
-Suggested markdown later:
-![Create Post Page](./assets/create-post-page.png)
-![Feed Page](./assets/feed-page.png)
-
 ---
 
 ## ARCHITECTURE / DIAGRAMS
 
 Diagrams will be added later.
 
-Suggested future additions:
+upcoming future additions:
 
 - system architecture diagram
 - database schema diagram
@@ -437,46 +395,46 @@ Suggested future additions:
 
 ## ROADMAP
 
-Version 0.1
+Version 1.0.0
 
 - [x] Project idea finalized
 - [x] MVP scope planned
 - [ ] Create post API
-- [ ] Fetch posts API
-- [ ] Basic create post page
-- [ ] Basic feed page
+- [x] Fetch posts API
+- [x] Basic create post page
+- [x] Basic feed page
 
-Version 0.2
+Version 1.1.0
 
-- [ ] User model
 - [ ] Signup / login
 - [ ] Basic auth flow
+- [ ] Update Post model
 - [ ] Link posts to users
 
-Version 0.3
+Version 1.1.1
 
+- [ ] Profile pages
 - [ ] Search users
 - [ ] Connection requests
 - [ ] Accept / reject requests
 - [ ] Connection-only content access
 
+Version 1.1.2
+
+- [ ] Likes
+- [ ] Comments
+- [ ] Block / remove connection
+- [ ] Notifications
+
 Version 0.4
 
+- [ ] Better UI / UX
+- [ ] Media storage improvements
+- [ ] Deployment
 - [ ] Close Friends
 - [ ] Circles / groups
 - [ ] Post-level audience control
 - [ ] Visibility filtering logic
-
-Version 0.5+
-
-- [ ] Likes
-- [ ] Comments
-- [ ] Notifications
-- [ ] Profile pages
-- [ ] Block / remove connection
-- [ ] Better UI / UX
-- [ ] Media storage improvements
-- [ ] Deployment
 
 ---
 
