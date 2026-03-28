@@ -7,7 +7,7 @@ function Home() {
   const [posts, setPosts] = useState([
     {
       caption: "Caption",
-      img: "https://ik.imagekit.io/spt0esuxbo/Screenshot_2026-03-17_204946_YMFAU37Qy.png?updatedAt=1774692423061",
+      img: "test link",
       content: "Content",
     },
   ]);
