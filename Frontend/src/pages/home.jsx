@@ -1,6 +1,7 @@
 import React from "react";
 import "../styles/home.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 function Home() {
   const [posts, setPosts] = useState([
@@ -10,6 +11,17 @@ function Home() {
       content: "Content",
     },
   ]);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/api/post")
+      .then((res) => {
+        setPosts(res.data);
+      })
+      .catch((e) => {
+        console.error("Error fetching posts:", e);
+      });
+  }, []);
 
   return (
     <div className="home-container">
