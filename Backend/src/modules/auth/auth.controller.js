@@ -1,4 +1,5 @@
 import user from "../../models/user.model.js";
+import session from "../../models/session.model.js";
 import { uploadProfileImage } from "../../services/imagekit.service.js";
 import jwt from "jsonwebtoken";
 
@@ -61,23 +62,45 @@ export const login = async (req, res) => {
       return res.status(400).json({ error: "Invalid credentials" });
     }
 
-    const token = jwt.sign(
+    const accessToken = jwt.sign(
       { userId: existingUser._id },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" },
+      { expiresIn: "15m" },
     );
 
-    console.log(token);
+    const refreshToken = jwt.sign(
+      { userId: existingUser._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "15d" },
+    );
 
-    res.cookie("token", token, {
+    await session.create({
+      userId: existingUser._id,
+      refreshToken: refreshToken,
+      ip: req.ip,
+      userAgent: req.get("User-Agent"),
+    });
+
+    res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: true,
       sameSite: "strict",
-      maxAge: 3600000, // 1 hour
+      maxAge: 15 * 60 * 1000, // 15 minutes
     });
 
-    return res.status(200).json({ message: "Login successful", token });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
+    });
+
+    return res.status(200).json({ message: "Login successful" });
   } catch (error) {
     return res.status(500).json({ error: "Error logging in" });
   }
+};
+
+export const test = (req, res) => {
+  console.log(req.get("token"));
 };
