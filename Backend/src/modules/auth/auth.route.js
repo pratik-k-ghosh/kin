@@ -1,11 +1,16 @@
 import express from "express";
-import { register } from "./auth.controller.js";
+import * as authController from "./auth.controller.js";
 import multer from "multer";
 
+const authRoute = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-const authRoute = express.Router();
+authRoute.post(
+  "/register",
+  upload.single("profilePicture"),
+  authController.register,
+);
 
-authRoute.post("/register", upload.single("profilePicture"), register);
+authRoute.post("/login", authController.login);
 
 export default authRoute;

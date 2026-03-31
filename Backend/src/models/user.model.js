@@ -32,12 +32,9 @@ userSchema.pre("save", async function () {
   }
 });
 
-userSchema.methods.verifyPassword = async function ({
-  password,
-  hashedPassword,
-}) {
+userSchema.methods.verifyPassword = async function (password) {
   try {
-    return await argon2.verify(hashedPassword, password);
+    return await argon2.verify(this.password, password);
   } catch (error) {
     return false;
   }
