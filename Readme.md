@@ -399,7 +399,7 @@ Version 1.0.0
 
 - [x] Project idea finalized
 - [x] MVP scope planned
-- [ ] Create post API
+- [x] Create post API
 - [x] Fetch posts API
 - [x] Basic create post page
 - [x] Basic feed page

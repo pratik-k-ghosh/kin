@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 
 const postSchema = new mongoose.Schema(
   {
-    img: { type: String, default: null },
-    content: { type: String, default: null },
-    caption: { type: String, default: null },
+    img: { type: String, default: "" },
+    content: { type: String, default: "" },
+    caption: { type: String, default: "" },
   },
   { timestamps: true },
 );

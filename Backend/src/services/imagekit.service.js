@@ -8,6 +8,7 @@ export const uploadImage = async (file) => {
   const response = await client.files.upload({
     file: file.buffer.toString("base64"),
     fileName: file.originalname,
+    folder: "/kin/posts",
   });
   return response;
 };
