@@ -68,18 +68,21 @@ export const login = async (req, res) => {
       { expiresIn: "15m" },
     );
 
+    const newSession = await session.create({
+      userId: existingUser._id,
+      refreshToken: "",
+      ip: req.ip,
+      userAgent: req.get("User-Agent"),
+    });
+
     const refreshToken = jwt.sign(
-      { userId: existingUser._id },
+      { userId: existingUser._id, sessionId: newSession._id },
       process.env.JWT_SECRET,
       { expiresIn: "15d" },
     );
 
-    await session.create({
-      userId: existingUser._id,
-      refreshToken: refreshToken,
-      ip: req.ip,
-      userAgent: req.get("User-Agent"),
-    });
+    newSession.refreshToken = refreshToken;
+    await newSession.save();
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
@@ -101,6 +104,73 @@ export const login = async (req, res) => {
   }
 };
 
-export const test = (req, res) => {
-  console.log(req.get("token"));
+export const refreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.cookies;
+
+    if (!refreshToken) {
+      return res.status(401).json({ error: "Missing refresh token" });
+    }
+
+    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+
+    if (!decoded) {
+      return res.status(401).json({ error: "Invalid refresh token" });
+    }
+
+    const existingSession = await session.findOne({
+      _id: decoded.sessionId,
+      valid: true,
+    });
+
+    if (!existingSession) {
+      return res.status(401).json({ error: "Invalid refresh token" });
+    }
+
+    const isVerified = await existingSession.verifyRefreshToken(refreshToken);
+
+    if (!isVerified) {
+      return res.status(401).json({ error: "Invalid refresh token" });
+    }
+
+    const newAccessToken = jwt.sign(
+      { userId: decoded.userId },
+      process.env.JWT_SECRET,
+      { expiresIn: "15m" },
+    );
+
+    const newSession = await session.create({
+      userId: decoded.userId,
+      refreshToken: "",
+      ip: req.ip,
+      userAgent: req.get("User-Agent"),
+    });
+
+    const newRefreshToken = jwt.sign(
+      { userId: decoded.userId, sessionId: newSession._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "15d" },
+    );
+
+    newSession.refreshToken = newRefreshToken;
+    await newSession.save();
+
+    res.cookie("accessToken", newAccessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 15 * 60 * 1000, // 15 minutes
+    });
+
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
+    });
+
+    return res.status(201).json({ message: "Token refreshed successfully" });
+  } catch (error) {
+    return res.status(500).json({ error: "Error refreshing token" });
+  }
 };

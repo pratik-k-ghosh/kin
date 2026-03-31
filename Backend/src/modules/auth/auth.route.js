@@ -13,6 +13,6 @@ authRoute.post(
 
 authRoute.post("/login", authController.login);
 
-authRoute.get("/get", authController.test);
+authRoute.post("/refresh-token", authController.refreshToken);
 
 export default authRoute;

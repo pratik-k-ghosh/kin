@@ -20,8 +20,4 @@ connectDb();
 app.use("/api/post", postRoute);
 app.use("/api/auth", authRoute);
 
-app.get("/", (req, res) => {
-  res.status(200).send("Home");
-});
-
 export default app;
