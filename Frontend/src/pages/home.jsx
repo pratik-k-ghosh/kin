@@ -31,8 +31,8 @@ function Home() {
         posts.map((post) => (
           <div className="post">
             <h2>{post.caption}</h2>
-            <img src={post.img} alt={post.caption} />
-            <p>{post.content}</p>
+            {post.img !== "" && <img src={post.img} alt={post.caption} />}
+            <p>{post.content !== "" && post.content}</p>
           </div>
         ))
       ) : (
