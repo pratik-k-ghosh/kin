@@ -4,6 +4,7 @@ import cors from "cors";
 
 import { connectDb } from "./config/db.js";
 import postRoute from "./modules/post/post.route.js";
+import authRoute from "./modules/auth/auth.route.js";
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(cors());
 connectDb();
 
 app.use("/api/post", postRoute);
+app.use("/api/auth", authRoute);
 
 app.get("/", (req, res) => {
   res.status(200).send("Home");

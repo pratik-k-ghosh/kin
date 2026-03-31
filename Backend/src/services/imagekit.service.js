@@ -12,3 +12,12 @@ export const uploadImage = async (file) => {
   });
   return response;
 };
+
+export const uploadProfileImage = async (file) => {
+  const response = await client.files.upload({
+    file: file.buffer.toString("base64"),
+    fileName: file.originalname,
+    folder: "/kin/profiles",
+  });
+  return response;
+};
