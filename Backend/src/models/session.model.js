@@ -40,6 +40,6 @@ sessionSchema.methods.verifyRefreshToken = async function (token) {
   }
 };
 
-const Session = mongoose.model("Session", sessionSchema);
+const Session = mongoose.model("session", sessionSchema);
 
 export default Session;
