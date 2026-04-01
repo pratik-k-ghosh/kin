@@ -5,6 +5,11 @@ const postSchema = new mongoose.Schema(
     img: { type: String, default: "" },
     content: { type: String, default: "" },
     caption: { type: String, default: "" },
+    author: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+      required: true,
+    },
   },
   { timestamps: true },
 );

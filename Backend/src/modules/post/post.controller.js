@@ -9,6 +9,10 @@ export const getPost = async (req, res) => {
 
 // Create Post Controller
 export const createPost = async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   const { content, caption } = req.body;
   const img = req.file;
 
@@ -23,6 +27,7 @@ export const createPost = async (req, res) => {
     img: uploadedImage?.url || "",
     content,
     caption,
+    author: req.user._id,
   });
 
   res.status(201).send(newPost);

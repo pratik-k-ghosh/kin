@@ -25,7 +25,7 @@ export const authMiddleware = async (req, res, next) => {
     // if everything is valid, attach the user data to the request object and allow the request to proceed
     req.user = userData;
 
-    next();
+    return next();
   } catch (error) {
     return res.status(401).json({ error: "Unauthorized" });
   }
