@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import User from "../../models/user.model.js";
+import User from "../models/user.model.js";
 
 // middleware to protect routes that require authentication
 export const authMiddleware = async (req, res, next) => {
