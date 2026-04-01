@@ -1,9 +1,9 @@
-import post from "../../models/posts.model.js";
+import Post from "../../models/posts.model.js";
 import { uploadImage } from "../../services/imagekit.service.js";
 
 // to get all the posts for the feed
 export const getPost = async (req, res) => {
-  const posts = await post.find();
+  const posts = await Post.find();
   res.status(200).send(posts);
 };
 
@@ -19,7 +19,7 @@ export const createPost = async (req, res) => {
 
   const uploadedImage = img ? await uploadImage(img) : null;
 
-  const newPost = await post.create({
+  const newPost = await Post.create({
     img: uploadedImage?.url || "",
     content,
     caption,

@@ -40,6 +40,6 @@ userSchema.methods.verifyPassword = async function (password) {
   }
 };
 
-const user = new mongoose.model("user", userSchema);
+const User = new mongoose.model("User", userSchema);
 
-export default user;
+export default User;

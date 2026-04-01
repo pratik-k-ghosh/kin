@@ -1,18 +1,24 @@
-import user from "../../models/user.model.js";
-import session from "../../models/session.model.js";
+import User from "../../models/user.model.js";
+import Session from "../../models/session.model.js";
 import { uploadProfileImage } from "../../services/imagekit.service.js";
+import { createSession } from "../../utils/auth.session.js";
+import { authTokenGenerator } from "../../utils/auth.token.js";
+import { setAuthCookies } from "../../utils/auth.cookies.js";
 import jwt from "jsonwebtoken";
 
+// controller for Registering New Users
 export const register = async (req, res) => {
   try {
     const { userName, name, email, password } = req.body;
     const profilePicture = req.file;
 
+    // Checking if any field is missing
     if (!userName || !name || !email || !password) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const doesUserExist = await user.findOne({
+    // User that already exists with the same email or username
+    const doesUserExist = await User.findOne({
       $or: [{ email }, { userName }],
     });
 
@@ -20,16 +26,19 @@ export const register = async (req, res) => {
       return res.status(400).json({ error: "User already exists" });
     }
 
+    // if profile picture is provided, upload it and get the URL, otherwise set it to null
     const uploadedProfilePicture = profilePicture
       ? await uploadProfileImage(profilePicture)
       : null;
 
-    const newUser = await user.create({
+    // Storing the new user data in the database
+    const newUser = await User.create({
       userName: userName.toLowerCase(),
       name,
       email,
       password,
-      profilePicture: uploadedProfilePicture?.url || "",
+      profilePicture:
+        uploadedProfilePicture?.url || userName.charAt(0).toUpperCase(),
     });
 
     return res
@@ -40,63 +49,49 @@ export const register = async (req, res) => {
   }
 };
 
+// Controller for Logging in Users
 export const login = async (req, res) => {
   try {
+    // an identifier can be either email or username, so we will check for both
     const { identifier, password } = req.body;
 
     if (!identifier || !password) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const existingUser = await user.findOne({
+    const existingUser = await User.findOne({
       $or: [{ email: identifier }, { userName: identifier }],
     });
 
+    // if no user exists with the credentials provided, return an error
     if (!existingUser) {
       return res.status(400).json({ error: "Invalid credentials" });
     }
 
     const isPasswordValid = await existingUser.verifyPassword(password);
 
+    // Check if the password is valid, if not return an error
     if (!isPasswordValid) {
       return res.status(400).json({ error: "Invalid credentials" });
     }
 
-    const accessToken = jwt.sign(
-      { userId: existingUser._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "15m" },
-    );
-
-    const newSession = await session.create({
+    // if everything is valid, we can generate tokens
+    const newSession = await createSession({
       userId: existingUser._id,
       refreshToken: "",
       ip: req.ip,
       userAgent: req.get("User-Agent"),
     });
 
-    const refreshToken = jwt.sign(
-      { userId: existingUser._id, sessionId: newSession._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "15d" },
-    );
+    const { accessToken, refreshToken } = authTokenGenerator({
+      userId: existingUser._id,
+      sessionId: newSession._id,
+    });
 
     newSession.refreshToken = refreshToken;
     await newSession.save();
 
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      maxAge: 15 * 60 * 1000, // 15 minutes
-    });
-
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
-    });
+    setAuthCookies({ res, accessToken, refreshToken });
 
     return res.status(200).json({ message: "Login successful" });
   } catch (error) {
@@ -108,65 +103,63 @@ export const refreshToken = async (req, res) => {
   try {
     const { refreshToken } = req.cookies;
 
+    // Without a refresh token, we cannot refresh the access token
     if (!refreshToken) {
       return res.status(401).json({ error: "Missing refresh token" });
     }
 
     const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
 
+    // return an error if the refresh token is invalid or expired
     if (!decoded) {
       return res.status(401).json({ error: "Invalid refresh token" });
     }
 
-    const existingSession = await session.findOne({
+    // get the session from the database
+    const existingSession = await Session.findOne({
       _id: decoded.sessionId,
       valid: true,
     });
 
+    // return no valid session error
     if (!existingSession) {
-      return res.status(401).json({ error: "Invalid refresh token" });
+      return res.status(500).json({ error: "Invalid refresh token" });
     }
 
+    // match both refresh tokens
     const isVerified = await existingSession.verifyRefreshToken(refreshToken);
 
     if (!isVerified) {
       return res.status(401).json({ error: "Invalid refresh token" });
     }
 
-    const newAccessToken = jwt.sign(
-      { userId: decoded.userId },
-      process.env.JWT_SECRET,
-      { expiresIn: "15m" },
-    );
+    // if everything is valid, we can refresh all the tokens
 
-    const newSession = await session.create({
+    // invalidate the existing session
+    existingSession.valid = false;
+    await existingSession.save();
+
+    // create a new session and generate new tokens
+    const newSession = await createSession({
       userId: decoded.userId,
       refreshToken: "",
       ip: req.ip,
       userAgent: req.get("User-Agent"),
     });
 
-    const newRefreshToken = jwt.sign(
-      { userId: decoded.userId, sessionId: newSession._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "15d" },
-    );
+    const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
+      authTokenGenerator({
+        userId: decoded.userId,
+        sessionId: newSession._id,
+      });
 
     newSession.refreshToken = newRefreshToken;
     await newSession.save();
 
-    res.cookie("accessToken", newAccessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      maxAge: 15 * 60 * 1000, // 15 minutes
-    });
-
-    res.cookie("refreshToken", newRefreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
+    setAuthCookies({
+      res,
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
     });
 
     return res.status(201).json({ message: "Token refreshed successfully" });
