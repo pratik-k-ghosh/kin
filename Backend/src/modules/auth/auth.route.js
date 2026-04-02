@@ -15,8 +15,6 @@ authRoute.post(
 
 authRoute.post("/login", authMiddleware, authController.login);
 
-authRoute.post("/refresh-token", authController.refreshToken);
-
 authRoute.post("/logout", authMiddleware, authController.logout);
 
 export default authRoute;
