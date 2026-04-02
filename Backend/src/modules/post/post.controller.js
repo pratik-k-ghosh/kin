@@ -3,6 +3,10 @@ import { uploadImage } from "../../services/imagekit.service.js";
 
 // to get all the posts for the feed
 export const getPost = async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   const posts = await Post.find();
   res.status(200).send(posts);
 };

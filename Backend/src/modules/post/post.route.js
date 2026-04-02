@@ -6,7 +6,7 @@ import { authMiddleware } from "../../middlewares/auth.middleware.js";
 const postRoute = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-postRoute.get("/", getPost);
+postRoute.get("/", authMiddleware, getPost);
 postRoute.post("/create", authMiddleware, upload.single("img"), createPost);
 
 export default postRoute;

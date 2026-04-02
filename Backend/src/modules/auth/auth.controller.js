@@ -9,6 +9,10 @@ import jwt from "jsonwebtoken";
 // controller for Registering New Users
 export const register = async (req, res) => {
   try {
+    if (req.user) {
+      return res.status(400).json({ error: "You are already logged in" });
+    }
+
     const { userName, name, email, password } = req.body;
     const profilePicture = req.file;
 
@@ -52,6 +56,10 @@ export const register = async (req, res) => {
 // Controller for Logging in Users
 export const login = async (req, res) => {
   try {
+    if (req.user) {
+      return res.status(400).json({ error: "You are already logged in" });
+    }
+
     // an identifier can be either email or username, so we will check for both
     const { identifier, password } = req.body;
 
@@ -165,5 +173,30 @@ export const refreshToken = async (req, res) => {
     return res.status(201).json({ message: "Token refreshed successfully" });
   } catch (error) {
     return res.status(500).json({ error: "Error refreshing token" });
+  }
+};
+
+export const logout = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: "You are not logged in" });
+    }
+
+    const { refreshToken } = req.cookies;
+
+    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+
+    if (decoded) {
+      await Session.findOneAndUpdate(
+        { _id: decoded.sessionId },
+        { valid: false },
+      );
+    }
+
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    return res.status(500).json({ error: "Error logging out" });
   }
 };

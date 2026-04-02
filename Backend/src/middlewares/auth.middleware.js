@@ -8,7 +8,8 @@ export const authMiddleware = async (req, res, next) => {
 
     // if there is no access token in the cookies, return an error
     if (!token) {
-      return res.status(401).json({ error: "Unauthorized" });
+      req.user = null;
+      return next();
     }
 
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
@@ -19,7 +20,8 @@ export const authMiddleware = async (req, res, next) => {
 
     // if no user is found with the userId from the token, return an error
     if (!userData) {
-      return res.status(500).json({ error: "Unauthorized" });
+      req.user = null;
+      return next();
     }
 
     // if everything is valid, attach the user data to the request object and allow the request to proceed
@@ -27,6 +29,7 @@ export const authMiddleware = async (req, res, next) => {
 
     return next();
   } catch (error) {
-    return res.status(401).json({ error: "Unauthorized" });
+    req.user = null;
+    return next();
   }
 };
