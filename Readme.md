@@ -406,10 +406,10 @@ Version 1.0.0
 
 Version 1.1.0
 
-- [X] Signup / login
-- [ ] Basic auth flow
-- [X] Update Post model
-- [X] Link posts to users
+- [x] Signup / login
+- [x] Basic auth flow
+- [x] Update Post model
+- [x] Link posts to users
 
 Version 1.1.1
 

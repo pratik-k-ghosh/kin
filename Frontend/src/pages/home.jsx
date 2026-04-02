@@ -4,17 +4,13 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 function Home() {
-  const [posts, setPosts] = useState([
-    {
-      caption: "Caption",
-      img: "test link",
-      content: "Content",
-    },
-  ]);
+  const [posts, setPosts] = useState([]);
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/api/post")
+      .get("http://localhost:3000/api/post", {
+        withCredentials: true,
+      })
       .then((res) => {
         setPosts(res.data);
       })

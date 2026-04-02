@@ -22,7 +22,7 @@ function Post() {
 
   return (
     <div className="form-container">
-      <form onSubmit={handleSubmit} className="form">
+      <form onSubmit={handleSubmit}>
         <input
           type="text"
           name="caption"
@@ -31,7 +31,12 @@ function Post() {
         />
         <input type="file" name="img" id="img" />
         <textarea name="content" id="content" placeholder="Enter Content" />
-        <button type="submit">Post</button>
+        <div className="btns">
+          <button type="submit">Post</button>
+          <button type="button" onClick={() => navigate("/")}>
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   );
