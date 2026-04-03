@@ -11,7 +11,7 @@ function Register() {
     const formData = new FormData(e.target);
 
     axios
-      .post("http://localhost:3000/api/auth/register", formData)
+      .post(import.meta.env.VITE_REGISTER_API_URL, formData)
       .then(() => {
         navigate("/verify");
       })

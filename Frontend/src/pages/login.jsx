@@ -12,7 +12,7 @@ function Login() {
     const data = Object.fromEntries(formData.entries());
 
     axios
-      .post("http://localhost:3000/api/auth/login", data, {
+      .post(import.meta.env.VITE_LOGIN_API_URL, data, {
         withCredentials: true,
       })
       .then(() => {

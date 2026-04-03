@@ -13,12 +13,17 @@ export const register = async (req, res) => {
       return res.status(400).json({ error: "You are already logged in" });
     }
 
-    const { userName, name, email, password } = req.body;
+    const { userName, name, email, password, confirmPassword } = req.body;
     const profilePicture = req.file;
 
     // Checking if any field is missing
-    if (!userName || !name || !email || !password) {
+    if (!userName || !name || !email || !password || !confirmPassword) {
       return res.status(400).json({ error: "All fields are required" });
+    }
+
+    // Check if passwords match
+    if (password !== confirmPassword) {
+      return res.status(400).json({ error: "Passwords do not match" });
     }
 
     // User that already exists with the same email or username
@@ -30,13 +35,13 @@ export const register = async (req, res) => {
       return res.status(400).json({ error: "User already exists" });
     }
 
-    // if profile picture is provided, upload it and get the URL, otherwise set it to null
+    // upload profile picture and get the URL if provided, else set to null
     const uploadedProfilePicture = profilePicture
       ? await uploadProfileImage(profilePicture)
       : null;
 
     // Storing the new user data in the database
-    const newUser = await User.create({
+    await User.create({
       userName: userName.toLowerCase(),
       name,
       email,
@@ -45,9 +50,7 @@ export const register = async (req, res) => {
         uploadedProfilePicture?.url || userName.charAt(0).toUpperCase(),
     });
 
-    return res
-      .status(201)
-      .json({ message: "User registered successfully", user: newUser });
+    return res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
     return res.status(500).json({ error: "Error registering user" });
   }

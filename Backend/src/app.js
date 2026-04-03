@@ -25,7 +25,7 @@ app.use(
 );
 
 // connect to the database
-connectDb();
+await connectDb();
 
 // use routes
 app.use("/api/post", postRoute);

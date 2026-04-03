@@ -7,8 +7,10 @@ export const getPost = async (req, res) => {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  const posts = await Post.find();
-  res.status(200).send(posts);
+  const posts = await Post.find()
+    .sort({ createdAt: -1 })
+    .populate("author", "username profilePicture");
+  res.status(200).json(posts);
 };
 
 // Create Post Controller
@@ -34,5 +36,5 @@ export const createPost = async (req, res) => {
     author: req.user._id,
   });
 
-  res.status(201).send(newPost);
+  res.status(201).json({ message: "Post created successfully" });
 };

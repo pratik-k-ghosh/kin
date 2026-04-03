@@ -11,7 +11,9 @@ function Post() {
     const formData = new FormData(e.target);
 
     axios
-      .post("http://localhost:3000/api/post/create", formData)
+      .post(import.meta.env.VITE_CREATE_POST_API_URL, formData, {
+        withCredentials: true,
+      })
       .then(() => {
         navigate("/");
       })

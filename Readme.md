@@ -289,11 +289,11 @@ Installation
    cd kin
 
 2. Install backend dependencies
-   cd backend
+   cd Backend
    npm install
 
 3. Install frontend dependencies
-   cd ../frontend
+   cd ../Frontend
    npm install
 
 Environment Variables
